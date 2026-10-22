@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F5F6F8" />
+  <title>门店经营数据 · App 下载</title>
+  <link rel="icon" href="app-icon.jpg" />
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #181a1f;
+      --subtext: #8a9099;
+      --muted: #a5aab2;
+      --accent: #ef233c;
+      --accent-dark: #d9162e;
+      --accent-soft: #fff1f3;
+      --line: #edf0f3;
+      --shadow: 0 12px 40px rgba(30, 35, 45, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(24px, env(safe-area-inset-top)) 18px
+        max(24px, env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at 50% 0%, #ffffff 0%, rgba(255, 255, 255, 0) 42%),
+        var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "Microsoft YaHei", "Noto Sans CJK SC", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      width: min(100%, 460px);
+    }
+
+    .card {
+      padding: 34px 26px 26px;
+      text-align: center;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .app-icon {
+      display: block;
+      width: 108px;
+      height: 108px;
+      margin: 0 auto;
+      object-fit: cover;
+      border-radius: 26px;
+      box-shadow: 0 12px 28px rgba(239, 35, 60, 0.2);
+    }
+
+    h1 {
+      margin: 20px 0 6px;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--subtext);
+    }
+
+    .download-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 15px 16px;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 16px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .download-btn:active {
+      transform: scale(0.985);
+    }
+
+    .download-btn:focus-visible {
+      outline: 3px solid rgba(239, 35, 60, 0.35);
+      outline-offset: 3px;
+    }
+
+    .download-btn.ios {
+      background: #111318;
+      box-shadow: 0 10px 24px rgba(17, 19, 24, 0.18);
+    }
+
+    .download-btn.android {
+      background: linear-gradient(135deg, #16a36a, #0e8a58);
+      box-shadow: 0 10px 24px rgba(22, 163, 106, 0.22);
+    }
+
+    .platform-icon {
+      display: flex;
+      flex: 0 0 26px;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+    }
+
+    .platform-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .btn-text {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+    }
+
+    .btn-text strong {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .btn-text small {
+      font-size: 11px;
+      opacity: 0.72;
+    }
+
+    .chevron {
+      display: flex;
+      opacity: 0.55;
+    }
+
+    .chevron svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tip {
+      margin: 18px 0 0;
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ---------- iOS UUID 说明弹窗 ---------- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(16, 18, 22, 0.48);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-backdrop[hidden] {
+      display: none;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .modal {
+      width: min(100%, 380px);
+      padding: 26px 22px 20px;
+      text-align: center;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+      animation: modal-pop 0.18s ease-out;
+    }
+
+    @keyframes modal-pop {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .modal-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      color: #111318;
+      background: #f2f3f5;
+      border-radius: 14px;
+    }
+
+    .modal-icon svg {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .modal p {
+      margin: 0;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--subtext);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      height: 44px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+    }
+
+    .btn-secondary {
+      color: #5b616b;
+      background: #f3f4f6;
+    }
+
+    .btn-primary {
+      color: #ffffff;
+      background: var(--accent);
+      box-shadow: 0 8px 20px rgba(239, 35, 60, 0.24);
+    }
+
+    .btn-secondary:active,
+    .btn-primary:active {
+      transform: scale(0.985);
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 28px 18px 22px;
+      }
+
+      .app-icon {
+        width: 92px;
+        height: 92px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card" aria-labelledby="app-name">
+      <img
+        class="app-icon"
+        src="app-icon.jpg"
+        alt="门店经营数据 App 图标"
+        width="108"
+        height="108"
+      />
+
+      <h1 id="app-name">门店经营数据</h1>
+      <p class="subtitle">KW Charts · 股东经营数据查看</p>
+
+      <div class="download-list">
+        <!-- ============================================================
+             iOS 下载地址
+             以后要更换 iOS 分发页，直接改下面 href 即可。
+             如果换页后不需要再弹出 UUID 说明，把 data-uuid-notice 改为 "false"。
+             ============================================================ -->
+        <a
+          class="download-btn ios"
+          id="iosDownload"
+          href="https://www.betaqr.com.cn/udid"
+          data-uuid-notice="true"
+          aria-haspopup="dialog"
+        >
+          <span class="platform-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M16.365 1.43c0 1.14-.47 2.2-1.23 3.02-.79.85-2.08 1.5-3.16 1.42-.14-1.1.42-2.26 1.17-3.04.83-.86 2.24-1.48 3.22-1.4zM20.63 17.2c-.53 1.2-.78 1.73-1.46 2.8-.96 1.5-2.32 3.37-4 3.39-1.49.01-1.87-.97-3.89-.96-2.02.01-2.44.98-3.93.97-1.68-.01-2.97-1.7-3.93-3.2-2.7-4.2-2.98-9.13-1.32-11.75 1.18-1.86 3.04-2.95 4.79-2.95 1.78 0 2.9.98 4.37.98 1.43 0 2.3-.98 4.36-.98 1.56 0 3.22.85 4.4 2.32-3.87 2.12-3.24 7.64.61 9.38z"
+              />
+            </svg>
+          </span>
+          <span class="btn-text">
+            <strong>iOS 版下载</strong>
+            <small>iPhone / iPad</small>
+          </span>
+          <span class="chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+
+        <!-- ============================================================
+             Android 下载地址
+             以后要更换 APK 分发页，直接改下面 href 即可。
+             ============================================================ -->
+        <a
+          class="download-btn android"
+          id="androidDownload"
+          href="https://fir.xcxwo.com/9lqecgy8"
+        >
+          <span class="platform-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M7 9h10v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9zm-2 0a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0v-5a1 1 0 0 1 1-1zm14 0a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0v-5a1 1 0 0 1 1-1zM8.6 7l-1.2-2.1a.5.5 0 0 1 .86-.5L9.5 6.6c.78-.27 1.6-.4 2.5-.4s1.72.13 2.5.4l1.24-2.2a.5.5 0 0 1 .86.5L15.4 7A7.2 7.2 0 0 1 19 13H5a7.2 7.2 0 0 1 3.6-6zM9.5 10.2a.7.7 0 1 0 0 1.4.7.7 0 0 0 0-1.4zm5 0a.7.7 0 1 0 0 1.4.7.7 0 0 0 0-1.4z"
+              />
+            </svg>
+          </span>
+          <span class="btn-text">
+            <strong>Android 版下载</strong>
+            <small>APK 安装包</small>
+          </span>
+          <span class="chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+      </div>
+
+      <p class="tip">
+        iOS 安装前需先获取设备 UUID 并提供给开发者；Android 可直接下载 APK 安装包。
+      </p>
+    </section>
+
+    <footer>KW Charts · 门店经营数据</footer>
+  </main>
+
+  <!-- iOS UUID 说明弹窗 -->
+  <div class="modal-backdrop" id="iosModal" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="iosModalTitle"
+      aria-describedby="iosModalDesc"
+    >
+      <div class="modal-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M16.365 1.43c0 1.14-.47 2.2-1.23 3.02-.79.85-2.08 1.5-3.16 1.42-.14-1.1.42-2.26 1.17-3.04.83-.86 2.24-1.48 3.22-1.4zM20.63 17.2c-.53 1.2-.78 1.73-1.46 2.8-.96 1.5-2.32 3.37-4 3.39-1.49.01-1.87-.97-3.89-.96-2.02.01-2.44.98-3.93.97-1.68-.01-2.97-1.7-3.93-3.2-2.7-4.2-2.98-9.13-1.32-11.75 1.18-1.86 3.04-2.95 4.79-2.95 1.78 0 2.9.98 4.37.98 1.43 0 2.3-.98 4.36-.98 1.56 0 3.22.85 4.4 2.32-3.87 2.12-3.24 7.64.61 9.38z"
+          />
+        </svg>
+      </div>
+
+      <h2 id="iosModalTitle">iOS 下载说明</h2>
+      <p id="iosModalDesc">
+        由于 iOS 系统限制，安装测试版应用前需要先获取您 iPhone / iPad 的 UUID，
+        并提供给开发者。开发者将您的设备加入授权列表后，才能正常下载安装使用。
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelIos" type="button">取消</button>
+        <button class="btn-primary" id="confirmIos" type="button">
+          确认并获取 UUID
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var iosLink = document.getElementById("iosDownload");
+      var modal = document.getElementById("iosModal");
+      var confirmBtn = document.getElementById("confirmIos");
+      var cancelBtn = document.getElementById("cancelIos");
+      var lastFocused = null;
+
+      function openModal() {
+        lastFocused = document.activeElement;
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+        window.requestAnimationFrame(function () {
+          confirmBtn.focus();
+        });
+      }
+
+      function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove("modal-open");
+        if (lastFocused && typeof lastFocused.focus === "function") {
+          lastFocused.focus();
+        }
+      }
+
+      iosLink.addEventListener("click", function (event) {
+        // 以后如果 iOS 改成直接下载页，把 data-uuid-notice 改成 "false" 即可。
+        if (iosLink.dataset.uuidNotice === "false") {
+          return;
+        }
+        event.preventDefault();
+        openModal();
+      });
+
+      confirmBtn.addEventListener("click", function () {
+        window.location.href = iosLink.href;
+      });
+
+      cancelBtn.addEventListener("click", closeModal);
+
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeModal();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
